@@ -20,6 +20,14 @@ export const app=express();
 if(process.env.TRUST_PROXY)app.set('trust proxy',+process.env.TRUST_PROXY||1); // correct client IPs for rate limiting behind a proxy
 app.disable('x-powered-by');app.use(requestLog);app.use(helmet());app.use(cors({origin:config.origin,credentials:true}));
 app.use(express.json({limit:'100kb'}));app.use(express.urlencoded({extended:false}));app.use(cookieParser());app.use(noSqlGuard);app.use('/api',csrfOriginGuard);
+
+// Prevent browsers and proxies from caching API responses (critical for auth state, logout, and live balance)
+app.use('/api', (_req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
 const isDev = process.env.NODE_ENV !== 'production';
 
 // General API rate limit: disabled in development, generous in prod

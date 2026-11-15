@@ -28,7 +28,8 @@ import {
   Baby,
   Utensils,
   Truck,
-  HelpCircle
+  HelpCircle,
+  Loader2
 } from 'lucide-react';
 
 type UserMe = {
@@ -60,6 +61,12 @@ function NavbarContent({ onSearch }: { onSearch?: (q: string) => void }) {
   const [search, setSearch] = useState('');
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  async function triggerLogout(e?: React.SyntheticEvent) {
+    setIsLoggingOut(true);
+    await logoutUser('/login', e);
+  }
 
   const { data: user } = useApi<UserMe>('/auth/me');
 
@@ -233,11 +240,13 @@ function NavbarContent({ onSearch }: { onSearch?: (q: string) => void }) {
 
                 <button
                   type="button"
-                  onClick={() => logoutUser('/login')}
-                  className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition"
+                  disabled={isLoggingOut}
+                  onClick={triggerLogout}
+                  className="flex items-center gap-1 p-2 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition text-xs font-semibold cursor-pointer disabled:opacity-60"
                   title="Logout"
                 >
-                  <LogOut className="w-4 h-4" />
+                  {isLoggingOut ? <Loader2 className="w-4 h-4 animate-spin text-rose-600" /> : <LogOut className="w-4 h-4" />}
+                  <span className="hidden lg:inline">{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
                 </button>
               </div>
             ) : (
@@ -358,10 +367,12 @@ function NavbarContent({ onSearch }: { onSearch?: (q: string) => void }) {
                     </Link>
                     <button
                       type="button"
-                      onClick={() => logoutUser('/login')}
-                      className="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition cursor-pointer"
+                      disabled={isLoggingOut}
+                      onClick={triggerLogout}
+                      className="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition cursor-pointer disabled:opacity-60"
                     >
-                      <LogOut className="w-3.5 h-3.5" /> Logout
+                      {isLoggingOut ? <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-600" /> : <LogOut className="w-3.5 h-3.5" />}
+                      <span>{isLoggingOut ? '...' : 'Logout'}</span>
                     </button>
                   </div>
                 </div>
@@ -419,11 +430,12 @@ function NavbarContent({ onSearch }: { onSearch?: (q: string) => void }) {
                 {user && (
                   <button
                     type="button"
-                    onClick={() => logoutUser('/login')}
-                    className="w-full flex items-center gap-2.5 p-2 rounded-lg text-rose-600 hover:bg-rose-50 font-bold transition text-left cursor-pointer"
+                    disabled={isLoggingOut}
+                    onClick={triggerLogout}
+                    className="w-full flex items-center gap-2.5 p-2 rounded-lg text-rose-600 hover:bg-rose-50 font-bold transition text-left cursor-pointer disabled:opacity-60"
                   >
-                    <LogOut className="w-4 h-4 text-rose-500" />
-                    <span>Logout ({user.name})</span>
+                    {isLoggingOut ? <Loader2 className="w-4 h-4 animate-spin text-rose-500" /> : <LogOut className="w-4 h-4 text-rose-500" />}
+                    <span>{isLoggingOut ? 'Logging out...' : `Logout (${user.name})`}</span>
                   </button>
                 )}
               </div>

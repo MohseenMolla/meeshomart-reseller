@@ -18,13 +18,20 @@ import {
   X,
   CreditCard,
   PlusCircle,
-  Truck
+  Truck,
+  Loader2
 } from 'lucide-react';
 
 export default function SellerLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const path = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  async function triggerLogout(e?: React.SyntheticEvent) {
+    setIsLoggingOut(true);
+    await logoutUser('/login', e);
+  }
 
   const { data, error, loading, reload } = useApi<Overview>(
     path === '/seller/payment-result' ? null : '/sellers/me/overview'
@@ -47,10 +54,7 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
     { href: '/seller/security', label: 'Security & Password', icon: Shield }
   ];
 
-  async function handleLogout() {
-    await api('/auth/logout', { method: 'POST', body: {} });
-    router.push('/login');
-  }
+
 
   return (
     <OverviewCtx.Provider value={data}>
@@ -130,11 +134,12 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
             </Link>
             <button
               type="button"
-              onClick={() => logoutUser('/login')}
-              className="w-full flex items-center gap-2 text-xs text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-lg transition font-bold border border-rose-100 cursor-pointer"
+              disabled={isLoggingOut}
+              onClick={triggerLogout}
+              className="w-full flex items-center gap-2 text-xs text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-lg transition font-bold border border-rose-100 cursor-pointer disabled:opacity-60"
             >
-              <LogOut className="w-4 h-4" />
-              <span>Logout</span>
+              {isLoggingOut ? <Loader2 className="w-4 h-4 animate-spin text-rose-600" /> : <LogOut className="w-4 h-4" />}
+              <span>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
             </button>
           </div>
         </aside>
@@ -161,12 +166,13 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
 
             <button
               type="button"
-              onClick={() => logoutUser('/login')}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition shadow-2xs cursor-pointer active:scale-95"
+              disabled={isLoggingOut}
+              onClick={triggerLogout}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition shadow-2xs cursor-pointer active:scale-95 disabled:opacity-60"
               title="Log out of Reseller Panel"
             >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Logout</span>
+              {isLoggingOut ? <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-600" /> : <LogOut className="w-3.5 h-3.5" />}
+              <span>{isLoggingOut ? '...' : 'Logout'}</span>
             </button>
 
             <button
@@ -207,11 +213,12 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
             <div className="pt-3 border-t border-slate-200 space-y-2">
               <button
                 type="button"
-                onClick={() => logoutUser('/login')}
-                className="w-full py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition cursor-pointer active:scale-98"
+                disabled={isLoggingOut}
+                onClick={triggerLogout}
+                className="w-full py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition cursor-pointer active:scale-98 disabled:opacity-60"
               >
-                <LogOut className="w-4 h-4" />
-                <span>Logout from Reseller Panel</span>
+                {isLoggingOut ? <Loader2 className="w-4 h-4 animate-spin text-white" /> : <LogOut className="w-4 h-4" />}
+                <span>{isLoggingOut ? 'Logging out...' : 'Logout from Reseller Panel'}</span>
               </button>
 
               <div className="flex justify-between items-center text-[11px] px-1 text-slate-500 pt-1">

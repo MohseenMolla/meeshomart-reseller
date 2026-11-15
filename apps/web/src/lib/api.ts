@@ -73,7 +73,11 @@ export async function api<T = any>(
   const r = await fetch(url, {
     method: opts.method || (opts.body ? 'POST' : 'GET'),
     credentials: 'include',
-    headers: opts.body ? { 'Content-Type': 'application/json' } : undefined,
+    cache: 'no-store',
+    headers: {
+      ...(opts.body ? { 'Content-Type': 'application/json' } : {}),
+      'Cache-Control': 'no-cache'
+    },
     body: opts.body ? JSON.stringify(opts.body) : undefined
   });
 
@@ -101,22 +105,85 @@ export async function api<T = any>(
 export const bdt = (n: number) => (n ? `${n.toLocaleString('en-US')} TK` : '0 TK');
 export const tk = (n: number) => (n ? `${n.toLocaleString('en-US')} TK` : '0 TK');
 
+let logoutInProgress = false;
+
 /**
- * Universal logout helper:
- * 1. Calls API to revoke session and clear cookie with full attributes
- * 2. Falls back to GET /auth/logout if POST is blocked
- * 3. Performs a hard page navigation to clear all React contexts, SWR caches, and memory
+ * Universal bulletproof logout helper:
+ * 1. Instantly clears client storage (localStorage, sessionStorage) and client-accessible cookies
+ * 2. Fires logout requests to local Route Handler AND remote backend simultaneously
+ * 3. Caps network wait time to 1200ms so user is never stuck
+ * 4. Performs a hard page navigation with window.location.replace to reset all memory & state
  */
-export async function logoutUser(redirectTo: string = '/login') {
-  try {
-    await api('/auth/logout', { method: 'POST', body: {} });
-  } catch {
+export async function logoutUser(redirectTo: string = '/login', e?: React.SyntheticEvent) {
+  if (e && typeof e.preventDefault === 'function') {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  if (logoutInProgress) return;
+  logoutInProgress = true;
+
+  if (typeof window !== 'undefined') {
     try {
-      await fetch('/api/v1/auth/logout', { method: 'GET', credentials: 'include' });
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('MEESHOMART_BACKEND_URL');
+      sessionStorage.clear();
+    } catch {}
+
+    const expireStr = '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0';
+    try {
+      document.cookie = `token${expireStr}; SameSite=Lax`;
+      document.cookie = `token${expireStr}; SameSite=Lax; Secure`;
+      document.cookie = `token${expireStr}; Domain=${window.location.hostname}; SameSite=Lax`;
+      document.cookie = `token${expireStr}`;
     } catch {}
   }
+
+  const calls: Promise<any>[] = [];
+
+  // Local Next.js Route Handler (sets Set-Cookie on frontend domain)
+  try {
+    calls.push(
+      fetch('/api/v1/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+        cache: 'no-store'
+      }).catch(() => {})
+    );
+  } catch {}
+
+  // Direct backend call if configured or different
+  const apiBase = getApiBaseUrl();
+  if (apiBase && !apiBase.startsWith('/api')) {
+    try {
+      calls.push(
+        fetch(`${apiBase}/auth/logout`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({}),
+          cache: 'no-store'
+        }).catch(() => {})
+      );
+    } catch {}
+  }
+
+  // Maximum 1.2s wait for network, then unconditionally redirect
+  await Promise.race([
+    Promise.allSettled(calls),
+    new Promise((resolve) => setTimeout(resolve, 1200))
+  ]);
+
+  // HARD navigation to completely reset React state, contexts, and memory
   if (typeof window !== 'undefined') {
-    window.location.href = redirectTo;
+    if (window.location.pathname === redirectTo) {
+      window.location.reload();
+    } else {
+      window.location.replace(redirectTo);
+    }
   }
 }
 

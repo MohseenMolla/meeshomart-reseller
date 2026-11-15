@@ -172,16 +172,24 @@ auth.post('/login', async (req, res) => {
 const logoutHandler = async (req: Request, res: Response) => {
   try {
     const p: any = jwt.verify(req.cookies?.token || '', config.jwt);
-    if (p?.sid) await Session.updateOne({ _id: p.sid, userId: p.sub }, { revokedAt: new Date() });
+    if (p?.sid) await Session.updateOne({ _id: p.sid }, { revokedAt: new Date() });
+    if (p?.sub) await Session.updateMany({ userId: p.sub, revokedAt: { $exists: false } }, { revokedAt: new Date() });
   } catch {}
-  const cookieOpts = {
-    httpOnly: true,
-    secure: config.prod,
-    sameSite: 'lax' as const,
-    path: '/'
-  };
-  res.clearCookie('token', cookieOpts);
-  res.clearCookie('token');
+
+  const isSecure = config.prod || req.secure || req.headers['x-forwarded-proto'] === 'https';
+
+  res.setHeader('Clear-Site-Data', '"cookies", "cache"');
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
+  res.setHeader('Set-Cookie', [
+    `token=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax${isSecure ? '; Secure' : ''}`,
+    `token=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=None; Secure`,
+    `token=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`,
+    `token=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT`
+  ]);
+
   res.json({ success: true, message: 'Logged out successfully' });
 };
 

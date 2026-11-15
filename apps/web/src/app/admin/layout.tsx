@@ -18,7 +18,8 @@ import {
   Menu,
   X,
   Image as ImageIcon,
-  Layers
+  Layers,
+  Loader2
 } from 'lucide-react';
 
 type UserMe = {
@@ -31,6 +32,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const path = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  async function triggerLogout(e?: React.SyntheticEvent) {
+    setIsLoggingOut(true);
+    await logoutUser('/login', e);
+  }
 
   const { data: user, error, loading } = useApi<UserMe>('/auth/me');
 
@@ -61,10 +68,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/security', label: 'Security & 2FA', icon: Shield }
   ];
 
-  async function handleLogout() {
-    await api('/auth/logout', { method: 'POST', body: {} });
-    router.push('/login');
-  }
+
 
   return (
     <div className="flex min-h-screen flex-col md:flex-row bg-slate-50">
@@ -132,11 +136,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </Link>
           <button
             type="button"
-            onClick={() => logoutUser('/login')}
-            className="w-full flex items-center gap-2 text-xs text-rose-400 hover:bg-rose-950/40 px-3 py-2 rounded-lg transition font-bold border border-rose-900/50 cursor-pointer"
+            disabled={isLoggingOut}
+            onClick={triggerLogout}
+            className="w-full flex items-center gap-2 text-xs text-rose-400 hover:bg-rose-950/40 px-3 py-2 rounded-lg transition font-bold border border-rose-900/50 cursor-pointer disabled:opacity-60"
           >
-            <LogOut className="w-4 h-4" />
-            <span>Logout</span>
+            {isLoggingOut ? <Loader2 className="w-4 h-4 animate-spin text-rose-400" /> : <LogOut className="w-4 h-4" />}
+            <span>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
           </button>
         </div>
       </aside>
@@ -157,12 +162,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => logoutUser('/login')}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-rose-900/60 hover:bg-rose-800 text-rose-200 border border-rose-700/60 text-xs font-bold transition shadow-xs cursor-pointer active:scale-95"
+            disabled={isLoggingOut}
+            onClick={triggerLogout}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-rose-900/60 hover:bg-rose-800 text-rose-200 border border-rose-700/60 text-xs font-bold transition shadow-xs cursor-pointer active:scale-95 disabled:opacity-60"
             title="Log out of Admin Panel"
           >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Logout</span>
+            {isLoggingOut ? <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-200" /> : <LogOut className="w-3.5 h-3.5" />}
+            <span>{isLoggingOut ? '...' : 'Logout'}</span>
           </button>
 
           <button
@@ -203,11 +209,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="pt-3 border-t border-slate-800 space-y-2">
             <button
               type="button"
-              onClick={() => logoutUser('/login')}
-              className="w-full py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition cursor-pointer active:scale-98"
+              disabled={isLoggingOut}
+              onClick={triggerLogout}
+              className="w-full py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition cursor-pointer active:scale-98 disabled:opacity-60"
             >
-              <LogOut className="w-4 h-4" />
-              <span>Logout from Admin Panel</span>
+              {isLoggingOut ? <Loader2 className="w-4 h-4 animate-spin text-white" /> : <LogOut className="w-4 h-4" />}
+              <span>{isLoggingOut ? 'Logging out...' : 'Logout from Admin Panel'}</span>
             </button>
 
             <div className="flex justify-between items-center text-[11px] px-1 text-slate-400 pt-1">
