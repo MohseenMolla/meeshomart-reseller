@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { api, useApi } from '@/lib/api';
+import { api, useApi, logoutUser } from '@/lib/api';
 import {
   LayoutDashboard,
   Users,
@@ -131,8 +131,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <ExternalLink className="w-3.5 h-3.5" />
           </Link>
           <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-2 text-xs text-rose-400 hover:bg-rose-950/30 px-3 py-2 rounded-lg transition font-medium"
+            type="button"
+            onClick={() => logoutUser('/login')}
+            className="w-full flex items-center gap-2 text-xs text-rose-400 hover:bg-rose-950/40 px-3 py-2 rounded-lg transition font-bold border border-rose-900/50 cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
             <span>Logout</span>
@@ -140,43 +141,82 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      {/* Mobile Top Header */}
-      <div className="md:hidden bg-slate-900 text-white p-4 flex items-center justify-between border-b border-slate-800">
+      {/* Mobile Top Header with Quick Logout Button */}
+      <div className="md:hidden bg-slate-900 text-white p-3.5 flex items-center justify-between border-b border-slate-800 sticky top-0 z-30">
         <Link href="/admin" className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-brand flex items-center justify-center font-bold">M</div>
-          <span className="font-black text-sm">MeeshoMart Admin</span>
+          <img src="/logo-m.jpg" alt="MeeshoMart" className="h-7 w-7 rounded-lg object-cover" />
+          <div>
+            <span className="font-black text-xs text-white leading-tight block">MeeshoMart</span>
+            <span className="text-[9px] text-emerald-400 font-semibold block leading-tight">
+              {isSuperAdmin ? 'Admin' : 'Manager'}
+            </span>
+          </div>
         </Link>
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-1.5 rounded-lg border border-slate-700 text-slate-300"
-        >
-          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+
+        {/* Right side mobile actions: Quick Logout + Menu Toggle */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => logoutUser('/login')}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-rose-900/60 hover:bg-rose-800 text-rose-200 border border-rose-700/60 text-xs font-bold transition shadow-xs cursor-pointer active:scale-95"
+            title="Log out of Admin Panel"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Logout</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-1.5 rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800"
+            aria-label="Toggle Navigation"
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
 
-      {/* Mobile Dropdown */}
+      {/* Mobile Dropdown Nav */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-slate-900 border-b border-slate-800 p-4 space-y-1 text-slate-300 shadow-xl">
-          {nav.map((item) => {
-            const Icon = item.icon;
-            const active = path === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium ${
-                  active ? 'bg-brand text-white' : 'hover:bg-slate-800'
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                <span>{item.label}</span>
+        <div className="md:hidden bg-slate-900 border-b border-slate-800 p-4 space-y-2 text-slate-300 shadow-2xl animate-in slide-in-from-top-2 duration-150">
+          <div className="space-y-1">
+            {nav.map((item) => {
+              const Icon = item.icon;
+              const active = path === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium ${
+                    active ? 'bg-brand text-white' : 'hover:bg-slate-800'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Mobile Menu Bottom Action Block */}
+          <div className="pt-3 border-t border-slate-800 space-y-2">
+            <button
+              type="button"
+              onClick={() => logoutUser('/login')}
+              className="w-full py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition cursor-pointer active:scale-98"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Logout from Admin Panel</span>
+            </button>
+
+            <div className="flex justify-between items-center text-[11px] px-1 text-slate-400 pt-1">
+              <Link href="/" target="_blank" className="hover:text-white flex items-center gap-1">
+                <span>Public Store</span>
+                <ExternalLink className="w-3 h-3" />
               </Link>
-            );
-          })}
-          <div className="pt-2 border-t border-slate-800 flex justify-between items-center text-xs">
-            <Link href="/" target="_blank" className="text-slate-400">Public Store</Link>
-            <button onClick={handleLogout} className="text-rose-400 font-medium">Logout</button>
+              <span>{user?.name}</span>
+            </div>
           </div>
         </div>
       )}

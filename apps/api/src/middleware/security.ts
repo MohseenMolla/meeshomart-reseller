@@ -5,7 +5,7 @@ const originOf=(u:string)=>{try{return new URL(u).origin;}catch{return '';}};
 const allowed=()=>new Set([originOf(config.origin),originOf(config.apiUrl)]);
 /** CSRF defence for cookie auth: state-changing requests that carry the session cookie must come from our own origin. */
 export function csrfOriginGuard(req:Request,res:Response,next:NextFunction){
- if(!UNSAFE.has(req.method)||!req.cookies?.token)return next();
+ if(!UNSAFE.has(req.method)||!req.cookies?.token||req.originalUrl?.includes('/auth/logout')||req.path?.includes('/logout'))return next();
  const o=req.headers.origin?String(req.headers.origin):originOf(String(req.headers.referer||''));
  if(o&&allowed().has(o))return next();
  res.status(403).json({success:false,error:'Cross-site request blocked'});}

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { api, tk, useApi } from '@/lib/api';
+import { api, tk, useApi, logoutUser } from '@/lib/api';
 import { OverviewCtx, type Overview } from '@/lib/overview';
 import {
   LayoutDashboard,
@@ -129,8 +129,9 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
               <ExternalLink className="w-3.5 h-3.5" />
             </Link>
             <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-2 text-xs text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition font-medium"
+              type="button"
+              onClick={() => logoutUser('/login')}
+              className="w-full flex items-center gap-2 text-xs text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-lg transition font-bold border border-rose-100 cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
               <span>Logout</span>
@@ -138,21 +139,41 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
           </div>
         </aside>
 
-        {/* Mobile Header */}
-        <div className="md:hidden bg-white border-b border-slate-200 p-4 flex items-center justify-between">
+        {/* Mobile Top Header with Quick Logout Button */}
+        <div className="md:hidden bg-white border-b border-slate-200 p-3.5 flex items-center justify-between sticky top-0 z-30 shadow-2xs">
           <Link href="/seller" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-brand flex items-center justify-center text-white">
-              <ShoppingBag className="w-4 h-4" />
+            <img src="/logo-m.jpg" alt="MeeshoMart" className="h-7 w-7 rounded-lg object-cover" />
+            <div>
+              <span className="font-black text-xs text-slate-900 leading-tight block">MeeshoMart</span>
+              <span className="text-[9px] text-[#00796b] font-semibold block leading-tight">Reseller</span>
             </div>
-            <span className="font-black text-slate-900">MeeshoMart Reseller</span>
           </Link>
-          <div className="flex items-center gap-2">
-            <Link href="/seller/wallet" className="text-xs bg-emerald-50 text-emerald-800 font-bold px-2 py-1 rounded border border-emerald-200">
+
+          {/* Right side mobile actions: Wallet + Quick Logout + Menu Toggle */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <Link
+              href="/seller/wallet"
+              className="text-[11px] bg-emerald-50 text-emerald-800 font-bold px-2 py-1 rounded-lg border border-emerald-200 shrink-0"
+              title="Available Wallet Balance"
+            >
               {tk(data.wallet.available)}
             </Link>
+
             <button
+              type="button"
+              onClick={() => logoutUser('/login')}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition shadow-2xs cursor-pointer active:scale-95"
+              title="Log out of Reseller Panel"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Logout</span>
+            </button>
+
+            <button
+              type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 rounded-lg border border-slate-200 text-slate-600"
+              className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100"
+              aria-label="Toggle Navigation"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -161,27 +182,45 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
 
         {/* Mobile Dropdown Nav */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-b border-slate-200 p-4 space-y-1 shadow-lg">
-            {nav.map((item) => {
-              const Icon = item.icon;
-              const active = path === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium ${
-                    active ? 'bg-brand text-white' : 'text-slate-600 hover:bg-slate-100'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span>{item.label}</span>
+          <div className="md:hidden bg-white border-b border-slate-200 p-4 space-y-2 shadow-xl animate-in slide-in-from-top-2 duration-150">
+            <div className="space-y-1">
+              {nav.map((item) => {
+                const Icon = item.icon;
+                const active = path === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium ${
+                      active ? 'bg-brand text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Mobile Menu Bottom Action Block */}
+            <div className="pt-3 border-t border-slate-200 space-y-2">
+              <button
+                type="button"
+                onClick={() => logoutUser('/login')}
+                className="w-full py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition cursor-pointer active:scale-98"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout from Reseller Panel</span>
+              </button>
+
+              <div className="flex justify-between items-center text-[11px] px-1 text-slate-500 pt-1">
+                <Link href="/" target="_blank" className="hover:text-slate-800 flex items-center gap-1">
+                  <span>Visit Public Store</span>
+                  <ExternalLink className="w-3 h-3" />
                 </Link>
-              );
-            })}
-            <div className="pt-2 border-t border-slate-200 flex justify-between items-center text-xs">
-              <Link href="/" target="_blank" className="text-slate-500">Public Store</Link>
-              <button onClick={handleLogout} className="text-red-600 font-medium">Logout</button>
+                <span>{data.shopName || data.name}</span>
+              </div>
             </div>
           </div>
         )}

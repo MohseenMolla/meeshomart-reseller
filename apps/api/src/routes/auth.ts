@@ -169,14 +169,24 @@ auth.post('/login', async (req, res) => {
   });
 });
 
-auth.post('/logout', async (req: Request, res) => {
+const logoutHandler = async (req: Request, res: Response) => {
   try {
     const p: any = jwt.verify(req.cookies?.token || '', config.jwt);
     if (p?.sid) await Session.updateOne({ _id: p.sid, userId: p.sub }, { revokedAt: new Date() });
   } catch {}
+  const cookieOpts = {
+    httpOnly: true,
+    secure: config.prod,
+    sameSite: 'lax' as const,
+    path: '/'
+  };
+  res.clearCookie('token', cookieOpts);
   res.clearCookie('token');
-  res.json({ success: true });
-});
+  res.json({ success: true, message: 'Logged out successfully' });
+};
+
+auth.post('/logout', logoutHandler);
+auth.get('/logout', logoutHandler);
 
 auth.get('/me', requireAuth, async (req: AuthReq, res) => {
   const u = await User.findById(req.auth!.userId).select('name email phone role verified totpEnabled').lean();

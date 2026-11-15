@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { useApi } from '@/lib/api';
+import { useApi, logoutUser } from '@/lib/api';
 import {
   ShoppingBag,
   Search,
@@ -207,9 +207,9 @@ function NavbarContent({ onSearch }: { onSearch?: (q: string) => void }) {
               </div>
             </a>
 
-            {/* User Account / Logged in Dashboard Button */}
+            {/* User Account / Logged in Dashboard Button & Quick Logout */}
             {user ? (
-              <div className="relative">
+              <div className="flex items-center gap-1 sm:gap-2">
                 <Link
                   href={isStaff ? '/admin' : '/seller'}
                   className="flex items-center gap-2 p-1 sm:p-1.5 rounded-xl border border-slate-200 hover:border-[#00796b] bg-slate-50 hover:bg-white transition"
@@ -230,6 +230,15 @@ function NavbarContent({ onSearch }: { onSearch?: (q: string) => void }) {
                     </span>
                   </div>
                 </Link>
+
+                <button
+                  type="button"
+                  onClick={() => logoutUser('/login')}
+                  className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition"
+                  title="Logout"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
               </div>
             ) : (
               <div className="flex items-center gap-1.5 sm:gap-2">
@@ -339,14 +348,21 @@ function NavbarContent({ onSearch }: { onSearch?: (q: string) => void }) {
                 <div className="p-3 bg-emerald-50/60 rounded-xl border border-emerald-100">
                   <p className="font-bold text-slate-900 text-sm">{user.name}</p>
                   <p className="text-[11px] text-slate-500 font-mono">{user.phone || 'Reseller'}</p>
-                  <div className="mt-2.5 pt-2 border-t border-emerald-100 flex gap-2">
+                  <div className="mt-2.5 pt-2 border-t border-emerald-100 grid grid-cols-2 gap-2">
                     <Link
                       href={isStaff ? '/admin' : '/seller'}
                       onClick={() => setMobileDrawerOpen(false)}
-                      className="btn flex-1 !py-1.5 text-xs font-bold justify-center"
+                      className="btn !py-1.5 text-xs font-bold justify-center"
                     >
                       <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
                     </Link>
+                    <button
+                      type="button"
+                      onClick={() => logoutUser('/login')}
+                      className="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition cursor-pointer"
+                    >
+                      <LogOut className="w-3.5 h-3.5" /> Logout
+                    </button>
                   </div>
                 </div>
               ) : (
@@ -400,6 +416,16 @@ function NavbarContent({ onSearch }: { onSearch?: (q: string) => void }) {
                 >
                   <Truck className="w-4 h-4 text-[#00796b]" /> Order Tracking
                 </Link>
+                {user && (
+                  <button
+                    type="button"
+                    onClick={() => logoutUser('/login')}
+                    className="w-full flex items-center gap-2.5 p-2 rounded-lg text-rose-600 hover:bg-rose-50 font-bold transition text-left cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4 text-rose-500" />
+                    <span>Logout ({user.name})</span>
+                  </button>
+                )}
               </div>
 
               {/* Categories Section */}

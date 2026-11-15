@@ -101,6 +101,25 @@ export async function api<T = any>(
 export const bdt = (n: number) => (n ? `${n.toLocaleString('en-US')} TK` : '0 TK');
 export const tk = (n: number) => (n ? `${n.toLocaleString('en-US')} TK` : '0 TK');
 
+/**
+ * Universal logout helper:
+ * 1. Calls API to revoke session and clear cookie with full attributes
+ * 2. Falls back to GET /auth/logout if POST is blocked
+ * 3. Performs a hard page navigation to clear all React contexts, SWR caches, and memory
+ */
+export async function logoutUser(redirectTo: string = '/login') {
+  try {
+    await api('/auth/logout', { method: 'POST', body: {} });
+  } catch {
+    try {
+      await fetch('/api/v1/auth/logout', { method: 'GET', credentials: 'include' });
+    } catch {}
+  }
+  if (typeof window !== 'undefined') {
+    window.location.href = redirectTo;
+  }
+}
+
 export function useApi<T>(path: string | null) {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
