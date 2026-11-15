@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { imgUrl } from '@/lib/img';
+import { getApiBaseUrl } from '@/lib/api';
 import { UploadCloud, Link as LinkIcon, Plus, X, Star } from 'lucide-react';
 
 export type Img = { url: string; publicId: string };
@@ -40,7 +41,7 @@ export default function ImageUploader({
     try {
       const fd = new FormData();
       files.forEach((f) => fd.append('files', f));
-      const r = await fetch('/api/v1/uploads/product-images', {
+      const r = await fetch(`${getApiBaseUrl()}/uploads/product-images`, {
         method: 'POST',
         body: fd,
         credentials: 'include'
@@ -83,7 +84,7 @@ export default function ImageUploader({
     onChange(value.filter((v) => v.publicId !== i.publicId));
     if (fresh.current.has(i.publicId)) {
       fresh.current.delete(i.publicId);
-      fetch('/api/v1/uploads/product-images/delete', {
+      fetch(`${getApiBaseUrl()}/uploads/product-images/delete`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },

@@ -247,9 +247,23 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
           <p>All right reserved © 2025 MeeshoMart Reseller</p>
-          <p className="flex items-center gap-1">
-            Developed by <span className="font-bold text-slate-800">MIT</span>
-          </p>
+          <div className="flex items-center gap-3">
+            {process.env.NEXT_PUBLIC_ACTIVE_BACKEND && (
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-[10px] text-slate-600 font-mono">
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    process.env.NEXT_PUBLIC_ACTIVE_BACKEND.includes('localhost')
+                      ? 'bg-amber-500'
+                      : 'bg-emerald-500'
+                  }`}
+                />
+                Backend: {process.env.NEXT_PUBLIC_ACTIVE_BACKEND.includes('localhost') ? 'Local (4000)' : 'Online (Render)'}
+              </span>
+            )}
+            <p className="flex items-center gap-1">
+              Developed by <span className="font-bold text-slate-800">MIT</span>
+            </p>
+          </div>
         </div>
       </div>
     </footer>
