@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 520" width="1600" height="520" fill="none">
+  <defs>
+    <linearGradient id="bgGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#042f2e"/>
+    </linearGradient>
+    <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00796b"/>
+      <stop offset="100%" stop-color="#14b8a6"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="30" result="blur"/>
+    </filter>
+  </defs>
+
+  {/* Background */}
+  <rect width="1600" height="520" rx="24" fill="url(#bgGrad2)"/>
+
+  {/* Background Glowing Circles */}
+  <circle cx="1300" cy="200" r="220" fill="#00796b" opacity="0.25" filter="url(#glow)"/>
+  <circle cx="300" cy="400" r="180" fill="#f59e0b" opacity="0.15" filter="url(#glow)"/>
+
+  {/* Left Content Area */}
+  {/* Badge */}
+  <g transform="translate(80, 60)">
+    <rect width="250" height="40" rx="20" fill="rgba(255, 255, 255, 0.1)" stroke="rgba(20, 184, 166, 0.4)" stroke-width="1.5"/>
+    <circle cx="24" cy="20" r="6" fill="#14b8a6"/>
+    <text x="40" y="25" fill="#5eead4" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700">WINTER &amp; NEW ARRIVALS 2025</text>
+  </g>
+
+  {/* Big Headline */}
+  <g transform="translate(80, 160)">
+    <text font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="52" font-weight="900" fill="#ffffff" letter-spacing="-1">
+      Trending Winter Jackets &amp;
+    </text>
+    <text y="68" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="52" font-weight="900" fill="url(#goldGrad)" letter-spacing="-1">
+      Premium Gadgets Wholesale
+    </text>
+  </g>
+
+  {/* Subtitle */}
+  <g transform="translate(80, 280)">
+    <text font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="400" fill="#cbd5e1">
+      Direct factory wholesale rates for verified Bangladeshi resellers.
+    </text>
+    <text y="32" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="400" fill="#cbd5e1">
+      High profit margin on luxury combos, smart watches, sound systems &amp; fashion.
+    </text>
+  </g>
+
+  {/* Feature Pills */}
+  <g transform="translate(80, 380)">
+    <g transform="translate(0, 0)">
+      <rect width="180" height="46" rx="10" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)"/>
+      <text x="90" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#f8fafc" text-anchor="middle">Up to 60% Margin</text>
+    </g>
+    <g transform="translate(195, 0)">
+      <rect width="185" height="46" rx="10" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)"/>
+      <text x="92" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#f8fafc" text-anchor="middle">Ready Stock Delivery</text>
+    </g>
+    <g transform="translate(395, 0)">
+      <rect width="190" height="46" rx="10" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)"/>
+      <text x="95" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#f8fafc" text-anchor="middle">No Advance Needed</text>
+    </g>
+  </g>
+
+  {/* Right Side Visual Showcase Cards */}
+  <g transform="translate(1000, 60)">
+    {/* Card 1: Luxury Combo */}
+    <g transform="translate(60, 40) rotate(-6)">
+      <rect width="210" height="270" rx="18" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+      <rect x="15" y="15" width="180" height="150" rx="12" fill="#0f172a"/>
+      {/* Watch graphic */}
+      <circle cx="105" cy="90" r="45" fill="none" stroke="#f59e0b" stroke-width="4"/>
+      <circle cx="105" cy="90" r="35" fill="#1e293b"/>
+      <line x1="105" y1="90" x2="105" y2="65" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+      <line x1="105" y1="90" x2="125" y2="90" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+      <text x="15" y="195" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="800" fill="#ffffff">Gold Watch &amp; Suit</text>
+      <text x="15" y="215" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#94a3b8">Dropship Price: 890 TK</text>
+      <rect x="15" y="225" width="85" height="24" rx="6" fill="#059669"/>
+      <text x="57" y="241" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#ffffff" text-anchor="middle">Profit: 360 TK</text>
+    </g>
+
+    {/* Card 2: Smart Tech */}
+    <g transform="translate(230, 90) rotate(8)">
+      <rect width="210" height="270" rx="18" fill="#1e293b" stroke="#00796b" stroke-width="2"/>
+      <rect x="15" y="15" width="180" height="150" rx="12" fill="#0f172a"/>
+      {/* Earbuds graphic */}
+      <rect x="70" y="55" width="70" height="70" rx="18" fill="#022c22" stroke="#14b8a6" stroke-width="2"/>
+      <circle cx="95" cy="90" r="8" fill="#14b8a6"/>
+      <circle cx="115" cy="90" r="8" fill="#14b8a6"/>
+      <text x="15" y="195" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="800" fill="#ffffff">T800 Ultra &amp; M10</text>
+      <text x="15" y="215" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#94a3b8">Wholesale: 650 TK</text>
+      <rect x="15" y="225" width="85" height="24" rx="6" fill="#059669"/>
+      <text x="57" y="241" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#ffffff" text-anchor="middle">Profit: 600 TK</text>
+    </g>
+  </g>
+</svg>

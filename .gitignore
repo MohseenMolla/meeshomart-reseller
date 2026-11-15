@@ -1,0 +1,12 @@
+# Environment variables
+.env
+*.env
+.env.*
+
+# Dependencies
+node_modules/
+
+# Build outputs & caches
+.next/
+dist/
+build/

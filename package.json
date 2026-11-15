@@ -1,0 +1,13 @@
+{
+ "name": "reseller-platform",
+ "private": true,
+ "workspaces": [
+  "apps/*"
+ ],
+ "scripts": {
+  "dev:api": "npm -w apps/api run dev",
+  "test": "npm -w apps/api test",
+  "dev:web": "npm -w apps/web run dev",
+  "build:web": "npm -w apps/web run build"
+ }
+}
