@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import { config } from './config';
 import mongoose from 'mongoose';
-import { csrfOriginGuard,noSqlGuard,requestLog } from './middleware/security';
+import { csrfOriginGuard, noSqlGuard, requestLog, isAllowedOrigin } from './middleware/security';
 import { auth } from './routes/auth';
 import { payments } from './routes/payments';
 import { plans,products,orders,wallet,banners,categories } from './routes/core';
@@ -18,7 +18,23 @@ import { myStore,publicStore } from './routes/storefront';
 import { withdrawals } from './routes/seller';
 export const app=express();
 if(process.env.TRUST_PROXY)app.set('trust proxy',+process.env.TRUST_PROXY||1); // correct client IPs for rate limiting behind a proxy
-app.disable('x-powered-by');app.use(requestLog);app.use(helmet());app.use(cors({origin:config.origin,credentials:true}));
+app.disable('x-powered-by');
+app.use(requestLog);
+app.use(helmet());
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || isAllowedOrigin(origin)) {
+        callback(null, origin || true);
+      } else {
+        callback(null, false);
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With', 'Accept']
+  })
+);
 app.use(express.json({limit:'100kb'}));app.use(express.urlencoded({extended:false}));app.use(cookieParser());app.use(noSqlGuard);app.use('/api',csrfOriginGuard);
 
 // Prevent browsers and proxies from caching API responses (critical for auth state, logout, and live balance)

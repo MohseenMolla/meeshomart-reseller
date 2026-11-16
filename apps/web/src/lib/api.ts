@@ -142,7 +142,7 @@ export async function logoutUser(redirectTo: string = '/login', e?: React.Synthe
 
   const calls: Promise<any>[] = [];
 
-  // Local Next.js Route Handler (sets Set-Cookie on frontend domain)
+  // Next.js Route Handler on frontend domain notifies backend server-to-server and clears cookies cleanly
   try {
     calls.push(
       fetch('/api/v1/auth/logout', {
@@ -154,22 +154,6 @@ export async function logoutUser(redirectTo: string = '/login', e?: React.Synthe
       }).catch(() => {})
     );
   } catch {}
-
-  // Direct backend call if configured or different
-  const apiBase = getApiBaseUrl();
-  if (apiBase && !apiBase.startsWith('/api')) {
-    try {
-      calls.push(
-        fetch(`${apiBase}/auth/logout`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({}),
-          cache: 'no-store'
-        }).catch(() => {})
-      );
-    } catch {}
-  }
 
   // Maximum 1.2s wait for network, then unconditionally redirect
   await Promise.race([
