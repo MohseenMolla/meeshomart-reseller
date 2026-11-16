@@ -1,13 +1,18 @@
 {
- "name": "reseller-platform",
- "private": true,
- "workspaces": [
-  "apps/*"
- ],
- "scripts": {
-  "dev:api": "npm -w apps/api run dev",
-  "test": "npm -w apps/api test",
-  "dev:web": "npm -w apps/web run dev",
-  "build:web": "npm -w apps/web run build"
- }
+  "name": "reseller-platform",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm -w api run build && npm -w web run build",
+    "build:api": "npm -w api run build",
+    "build:web": "npm -w web run build",
+    "start": "node apps/api/dist/server.js",
+    "start:api": "node apps/api/dist/server.js",
+    "start:web": "npm -w web start",
+    "dev:api": "npm -w api run dev",
+    "dev:web": "npm -w web run dev",
+    "test": "npm -w api test"
+  }
 }

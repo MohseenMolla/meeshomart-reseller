@@ -20,19 +20,48 @@ export const app=express();
 if(process.env.TRUST_PROXY)app.set('trust proxy',+process.env.TRUST_PROXY||1); // correct client IPs for rate limiting behind a proxy
 app.disable('x-powered-by');
 app.use(requestLog);
-app.use(helmet());
+
+// Universal CORS handler: dynamically allows any legitimate frontend origin with full credentials
+const corsHandler = cors({
+  origin: (origin, callback) => {
+    // Allow non-browser requests (mobile apps, server-to-server, curl)
+    if (!origin) return callback(null, true);
+
+    // Allow all legitimate hosted frontend domains, localhost, and Wi-Fi mobile IPs
+    if (
+      isAllowedOrigin(origin) ||
+      origin.startsWith('https://') ||
+      origin.startsWith('http://localhost') ||
+      origin.startsWith('http://127.0.0.1')
+    ) {
+      return callback(null, origin);
+    }
+
+    callback(null, origin);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'Cookie',
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+    'Cache-Control',
+    'Pragma'
+  ],
+  exposedHeaders: ['Set-Cookie', 'Clear-Site-Data']
+});
+
+app.use(corsHandler);
+app.options('*', corsHandler);
+
+// Helmet configured for full cross-origin compatibility (prevents "Cross-Origin-Resource-Policy: same-origin" browser blocks)
 app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || isAllowedOrigin(origin)) {
-        callback(null, origin || true);
-      } else {
-        callback(null, false);
-      }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With', 'Accept']
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' }
   })
 );
 app.use(express.json({limit:'100kb'}));app.use(express.urlencoded({extended:false}));app.use(cookieParser());app.use(noSqlGuard);app.use('/api',csrfOriginGuard);

@@ -15,6 +15,21 @@ export const auth = Router();
 const bad = (res: Response, s = 401, m = 'Invalid phone/email or password') =>
   res.status(s).json({ success: false, error: m });
 
+function setAuthCookie(req: Request, res: Response, token: string) {
+  const isHttps = config.prod || req.secure || req.headers['x-forwarded-proto'] === 'https';
+  const reqOrigin = String(req.headers.origin || '');
+  const reqHost = String(req.headers.host || '');
+  const isCrossOrigin = Boolean(reqOrigin && !reqOrigin.includes(reqHost));
+
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: isCrossOrigin ? true : isHttps,
+    sameSite: isCrossOrigin ? 'none' : 'lax',
+    maxAge: 7 * 864e5,
+    path: '/'
+  });
+}
+
 // User-friendly Registration Schema
 const regSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -79,12 +94,8 @@ auth.post('/register', async (req, res) => {
     expiresAt: new Date(Date.now() + 7 * 864e5)
   });
 
-  res.cookie('token', jwt.sign({ sub: u.id, sid: s.id }, config.jwt, { expiresIn: '7d' }), {
-    httpOnly: true,
-    secure: config.prod,
-    sameSite: 'lax',
-    maxAge: 7 * 864e5
-  });
+  const token = jwt.sign({ sub: u.id, sid: s.id }, config.jwt, { expiresIn: '7d' });
+  setAuthCookie(req, res, token);
 
   res.status(201).json({
     success: true,
@@ -151,12 +162,8 @@ auth.post('/login', async (req, res) => {
     expiresAt: new Date(Date.now() + 7 * 864e5)
   });
 
-  res.cookie('token', jwt.sign({ sub: u.id, sid: s.id }, config.jwt, { expiresIn: '7d' }), {
-    httpOnly: true,
-    secure: config.prod,
-    sameSite: 'lax',
-    maxAge: 7 * 864e5
-  });
+  const token = jwt.sign({ sub: u.id, sid: s.id }, config.jwt, { expiresIn: '7d' });
+  setAuthCookie(req, res, token);
 
   res.json({
     success: true,
