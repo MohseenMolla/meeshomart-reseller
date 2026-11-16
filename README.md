@@ -53,13 +53,6 @@ A full production-grade Dropshipping and Reselling Platform inspired by **dropsh
 
 ---
 
-## 🚀 Default Credentials (Seeded)
-
-| Role | Identifier / Email | Phone | Password | Panel URL |
-| :--- | :--- | :--- | :--- | :--- |
-| **Super Admin** | `admin@meeshomart.com` | `01410449778` | `admin123456` | `/admin` |
-| **Manager** | `manager@meeshomart.com` | `01812345678` | `manager123456` | `/admin` |
-| **Reseller** | `01731517072` (or `reseller@meeshomart.com`) | `01731517072` | `reseller123456` | `/seller` |
 
 ---
 
